@@ -291,7 +291,6 @@ const MOCK_POSTS: FeedItem[] = [
   },
 ];
 
-
 // --- Sub-components ---
 const PromoCard = ({ item }: { item: PromoItem }) => {
   const isHighlight = item.isHighlight;
@@ -383,12 +382,28 @@ const ConfettiOverlay = ({ active }: { active: boolean }) => {
     const rand = (a: number, b: number) => a + Math.random() * (b - a);
     const pick = <T,>(arr: T[]) => arr[(Math.random() * arr.length) | 0];
 
-    const spriteCache = new Map<string, { img: HTMLCanvasElement; ox: number; oy: number }>();
+    const spriteCache = new Map<
+      string,
+      { img: HTMLCanvasElement; ox: number; oy: number }
+    >();
 
-    const spriteKey = (r: number, g: number, b: number, bw: number, bh: number, blur: number) =>
-      `${r},${g},${b}|${bw}x${bh}|${blur}`;
+    const spriteKey = (
+      r: number,
+      g: number,
+      b: number,
+      bw: number,
+      bh: number,
+      blur: number,
+    ) => `${r},${g},${b}|${bw}x${bh}|${blur}`;
 
-    const makeSprite = (r: number, g: number, b: number, bw: number, bh: number, blur: number) => {
+    const makeSprite = (
+      r: number,
+      g: number,
+      b: number,
+      bw: number,
+      bh: number,
+      blur: number,
+    ) => {
       const pad = blur ? Math.ceil(blur * 3 + 6) : 2;
       const c = document.createElement("canvas");
       c.width = bw + pad * 2;
@@ -425,7 +440,14 @@ const ConfettiOverlay = ({ active }: { active: boolean }) => {
       return { img: c, ox: pad + bw / 2, oy: pad + bh / 2 };
     };
 
-    const getSprite = (r: number, g: number, b: number, bw: number, bh: number, blur: number) => {
+    const getSprite = (
+      r: number,
+      g: number,
+      b: number,
+      bw: number,
+      bh: number,
+      blur: number,
+    ) => {
       const key = spriteKey(r, g, b, bw, bh, blur);
       const cached = spriteCache.get(key);
       if (cached) return cached;
@@ -475,10 +497,18 @@ const ConfettiOverlay = ({ active }: { active: boolean }) => {
       const y = init ? rand(-80, h + 80) : rand(-260, -60);
 
       const vy =
-        layer === 0 ? rand(0.35, 0.85) : layer === 1 ? rand(0.7, 1.35) : rand(1.05, 2.0);
+        layer === 0
+          ? rand(0.35, 0.85)
+          : layer === 1
+            ? rand(0.7, 1.35)
+            : rand(1.05, 2.0);
 
       const vx =
-        layer === 0 ? rand(0.1, 0.28) : layer === 1 ? rand(0.16, 0.42) : rand(0.22, 0.62);
+        layer === 0
+          ? rand(0.1, 0.28)
+          : layer === 1
+            ? rand(0.16, 0.42)
+            : rand(0.22, 0.62);
 
       const rgb = pick(palette);
       const r = Math.round(rgb[0] * 0.72);
@@ -560,7 +590,15 @@ const ConfettiOverlay = ({ active }: { active: boolean }) => {
         ctx.rotate(p.rot);
         ctx.scale(0.06 + 0.94 * Math.abs(Math.sin(p.flip)), 1);
         ctx.globalAlpha =
-          p.layer === 0 ? 0.16 : p.layer === 1 ? 0.42 : p.ultra ? 0.95 : p.hero ? 0.9 : 0.72;
+          p.layer === 0
+            ? 0.16
+            : p.layer === 1
+              ? 0.42
+              : p.ultra
+                ? 0.95
+                : p.hero
+                  ? 0.9
+                  : 0.72;
         ctx.drawImage(p.spr.img, -p.spr.ox, -p.spr.oy);
         ctx.restore();
       }
@@ -675,8 +713,14 @@ export default function Home() {
         const sectionHeight = el.scrollHeight;
         const visibleHeight = window.innerHeight;
 
-        const totalScrollableInSection = Math.max(1, sectionHeight - visibleHeight);
-        const adjustedDistance = Math.max(0, scrolledDistance - energyBaseDistanceRef.current);
+        const totalScrollableInSection = Math.max(
+          1,
+          sectionHeight - visibleHeight,
+        );
+        const adjustedDistance = Math.max(
+          0,
+          scrolledDistance - energyBaseDistanceRef.current,
+        );
         const progress = Math.min(
           Math.max((adjustedDistance / totalScrollableInSection) * 100, 0),
           100,
@@ -700,8 +744,6 @@ export default function Home() {
       clearInterval(timer);
     };
   }, []);
-
-
 
   // Fetch posts from API (keep old if empty, detect changes)
   const fetchPosts = async () => {
@@ -733,17 +775,19 @@ export default function Home() {
 
       const normalized: FeedItem[] = list
         .filter(Boolean)
-        .map((p: any) => ({
-          id: typeof p?.id === "string" ? p.id : p?.id?.toString?.() || "",
-          title: typeof p?.title === "string" ? p.title : undefined,
-          user: String(p?.user ?? ""),
-          time: typeof p?.time === "string" ? p.time : undefined,
-          likes: p?.likes != null ? String(p.likes) : undefined,
-          comments: p?.comments != null ? String(p.comments) : undefined,
-          image: p?.image != null ? String(p.image) : undefined,
-          content: String(p?.content ?? ""),
-        }))
-        .filter((p) => p.id && (p.content || p.image));
+        .map(
+          (p: any): FeedItem => ({
+            id: typeof p?.id === "string" ? p.id : p?.id?.toString?.() || "",
+            title: typeof p?.title === "string" ? p.title : undefined,
+            user: String(p?.user ?? ""),
+            time: typeof p?.time === "string" ? p.time : undefined,
+            likes: p?.likes != null ? String(p.likes) : undefined,
+            comments: p?.comments != null ? String(p.comments) : undefined,
+            image: p?.image != null ? String(p.image) : undefined,
+            content: String(p?.content ?? ""),
+          }),
+        )
+        .filter((p: FeedItem) => p.id && (p.content || p.image));
 
       // If API returns empty, keep baseFeeds unchanged
       if (normalized.length === 0) {
@@ -884,7 +928,8 @@ export default function Home() {
       ).flat()
     : [];
 
-  const energyProgress = energyOverride !== null ? energyOverride : scrollProgress;
+  const energyProgress =
+    energyOverride !== null ? energyOverride : scrollProgress;
 
   useEffect(() => {
     // Trigger once when energy reaches 100% then reset back to 0%
@@ -912,10 +957,22 @@ export default function Home() {
 
       // IMPORTANT: Do NOT return a cleanup tied to energyProgress changes.
       // EnergyProgress will change several times during the reset sequence.
-      fireworksTimersRef.current.hide = setTimeout(() => setShowFireworks(false), 2200);
-      fireworksTimersRef.current.reset = setTimeout(() => setEnergyOverrideSafe(0), 2300);
-      fireworksTimersRef.current.release = setTimeout(() => setEnergyOverrideSafe(null), 3000);
-      fireworksTimersRef.current.toast = setTimeout(() => setToastMsg(""), 3200);
+      fireworksTimersRef.current.hide = setTimeout(
+        () => setShowFireworks(false),
+        2200,
+      );
+      fireworksTimersRef.current.reset = setTimeout(
+        () => setEnergyOverrideSafe(0),
+        2300,
+      );
+      fireworksTimersRef.current.release = setTimeout(
+        () => setEnergyOverrideSafe(null),
+        3000,
+      );
+      fireworksTimersRef.current.toast = setTimeout(
+        () => setToastMsg(""),
+        3200,
+      );
     }
 
     // Allow triggering again after we've reset and energy is low
