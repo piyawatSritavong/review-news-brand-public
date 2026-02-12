@@ -1359,7 +1359,7 @@ export default function Home() {
         >
           {/* Left Sidebar - Bottom Footer with Search & Mode Switch only */}
           <aside
-            className={`${isFacebookPinned ? "lg:flex flex-col w-64 shrink-0 fixed top-24 left-10 h-[calc(100vh-120px)] z-50" : "hidden"}`}
+            className={`${isFacebookPinned ? "md:hidden lg:flex flex-col w-64 shrink-0 fixed top-24 left-10 h-[calc(100vh-120px)] z-50" : "hidden"}`}
           >
             {/* Bottom Footer with Search & Mode Switch pushed to bottom */}
             <div className="mt-auto flex flex-col gap-4">
@@ -1486,7 +1486,7 @@ export default function Home() {
 
           {/* Right Sidebar - Vertical Energy Charging Bar */}
           <aside
-            className={`${isFacebookPinned ? "lg:block w-64 shrink-0 fixed top-24 right-10 h-[calc(100vh-120px)] z-50" : "hidden"}`}
+            className={`${isFacebookPinned ? "md:hidden lg:block w-64 shrink-0 fixed top-24 right-10 h-[calc(100vh-120px)] z-50" : "hidden"}`}
           >
             <div
               className={`h-125 w-24 backdrop-blur-2xl rounded-full border shadow-2xl relative overflow-hidden flex flex-col justify-end p-2 mx-auto ${isDarkMode ? "bg-white/5 border-white/20" : "bg-white/10 border-white/30"}`}
