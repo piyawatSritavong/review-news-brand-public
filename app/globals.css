@@ -5,6 +5,76 @@
   --foreground: #171717;
 }
 
+/* Full-screen fireworks burst */
+.fireworks-full {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.fireworks-full::before,
+.fireworks-full::after {
+  content: "";
+  position: absolute;
+  inset: -20vh -20vw;
+  background: transparent;
+  animation: fw-screen 1.15s ease-out forwards;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.25));
+}
+
+.fireworks-full::after {
+  animation-delay: 0.12s;
+}
+
+@keyframes fw-screen {
+  0% {
+    transform: scale(0.35);
+    opacity: 0;
+    box-shadow:
+      /* top-left */
+      20vw 20vh 0 0 rgba(59, 130, 246, 0.95),
+      24vw 26vh 0 0 rgba(139, 92, 246, 0.95),
+      30vw 18vh 0 0 rgba(236, 72, 153, 0.95),
+      /* top-right */ 80vw 18vh 0 0 rgba(34, 197, 94, 0.95),
+      74vw 26vh 0 0 rgba(250, 204, 21, 0.95),
+      86vw 24vh 0 0 rgba(249, 115, 22, 0.95),
+      /* center */ 50vw 45vh 0 0 rgba(59, 130, 246, 0.95),
+      46vw 52vh 0 0 rgba(139, 92, 246, 0.95),
+      54vw 52vh 0 0 rgba(236, 72, 153, 0.95),
+      /* bottom-left */ 18vw 78vh 0 0 rgba(34, 197, 94, 0.95),
+      28vw 86vh 0 0 rgba(250, 204, 21, 0.95),
+      24vw 72vh 0 0 rgba(249, 115, 22, 0.95),
+      /* bottom-right */ 82vw 78vh 0 0 rgba(59, 130, 246, 0.95),
+      72vw 86vh 0 0 rgba(139, 92, 246, 0.95),
+      76vw 72vh 0 0 rgba(236, 72, 153, 0.95);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+    box-shadow:
+      /* top-left burst */
+      6vw -8vh 0 0 rgba(59, 130, 246, 0),
+      -4vw 12vh 0 0 rgba(139, 92, 246, 0),
+      14vw 22vh 0 0 rgba(236, 72, 153, 0),
+      /* top-right burst */ 104vw 10vh 0 0 rgba(34, 197, 94, 0),
+      92vw -10vh 0 0 rgba(250, 204, 21, 0),
+      112vw 26vh 0 0 rgba(249, 115, 22, 0),
+      /* center burst */ 40vw 28vh 0 0 rgba(59, 130, 246, 0),
+      62vw 30vh 0 0 rgba(139, 92, 246, 0),
+      50vw 66vh 0 0 rgba(236, 72, 153, 0),
+      /* bottom-left burst */ -10vw 98vh 0 0 rgba(34, 197, 94, 0),
+      20vw 112vh 0 0 rgba(250, 204, 21, 0),
+      34vw 96vh 0 0 rgba(249, 115, 22, 0),
+      /* bottom-right burst */ 110vw 102vh 0 0 rgba(59, 130, 246, 0),
+      86vw 114vh 0 0 rgba(139, 92, 246, 0),
+      70vw 98vh 0 0 rgba(236, 72, 153, 0);
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

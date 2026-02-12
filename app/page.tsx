@@ -19,17 +19,15 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 
-
 type FeedItem = {
-  id: number;
-  title: string;
+  id: string;
+  title?: string;
   user: string;
-  time: string;
-  likes: string;
-  comments: string;
-  image: string;
+  time?: string;
+  likes?: string;
+  comments?: string;
+  image?: string;
   content: string;
-  uniqueId: number;
 };
 
 type PromoItem = {
@@ -99,99 +97,200 @@ const slides = [
   },
 ];
 
+const promoCreatedAt = new Date().toLocaleTimeString("th-TH", {
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
 const promoList1: PromoItem[] = [
   {
-    name: "Leighton Kramer",
-    value: "276.7 Eth",
-    img: "https://i.pravatar.cc/150?u=1",
+    name: "3.3 วันลดกระหน่ำ",
+    value: promoCreatedAt,
+    img: slides[0].image,
   },
   {
-    name: "Haylie Arcand",
-    value: "345.6 Eth",
-    img: "https://i.pravatar.cc/150?u=2",
+    name: "วันที่ 3 เดือน 3 เจอกัน 20 ทุ่ม",
+    value: promoCreatedAt,
+    img: slides[1].image,
     isHighlight: true,
   },
   {
-    name: "Bowen Higgins",
-    value: "323.7 Eth",
-    img: "https://i.pravatar.cc/150?u=3",
+    name: "Flash Sale 2 ชั่วโมงเท่านั้น",
+    value: promoCreatedAt,
+    img: slides[2].image,
   },
   {
-    name: "Saige Fuentes",
-    value: "347.7 Eth",
-    img: "https://i.pravatar.cc/150?u=4",
+    name: "โค้ดลับ: KP333 ลดเพิ่ม",
+    value: promoCreatedAt,
+    img: slides[0].image,
   },
   {
-    name: "Sophie Mclain",
-    value: "230.6 Eth",
-    img: "https://i.pravatar.cc/150?u=5",
+    name: "ส่งฟรีทั่วไทย วันนี้เท่านั้น",
+    value: promoCreatedAt,
+    img: slides[1].image,
+  },
+  {
+    name: "ลดเพิ่มเมื่อชำระก่อนเที่ยงคืน",
+    value: promoCreatedAt,
+    img: slides[2].image,
+  },
+  {
+    name: "สมาชิกใหม่รับคูปองทันที",
+    value: promoCreatedAt,
+    img: slides[0].image,
+  },
+  {
+    name: "ดีลพิเศษเฉพาะ 100 ออเดอร์แรก",
+    value: promoCreatedAt,
+    img: slides[1].image,
   },
 ];
 
 const promoList2: PromoItem[] = [
   {
-    name: "Jeremy Burch",
-    value: "267.9 Eth",
-    img: "https://i.pravatar.cc/150?u=6",
+    name: "โปร 1 แถม 1 เฉพาะออนไลน์",
+    value: promoCreatedAt,
+    img: slides[2].image,
   },
   {
-    name: "Amelie Griffith",
-    value: "334.1 Eth",
-    img: "https://i.pravatar.cc/150?u=7",
+    name: "ลดสูงสุด 70% เริ่มแล้ว",
+    value: promoCreatedAt,
+    img: slides[1].image,
   },
   {
-    name: "Isabela Hart",
-    value: "289.1 Eth",
-    img: "https://i.pravatar.cc/150?u=8",
+    name: "ดีลรายชั่วโมง รีบกดก่อนหมด",
+    value: promoCreatedAt,
+    img: slides[0].image,
   },
   {
-    name: "Diego Bentley",
-    value: "290.7 Eth",
-    img: "https://i.pravatar.cc/150?u=9",
+    name: "3.3 Midnight Deal 00:00",
+    value: promoCreatedAt,
+    img: slides[2].image,
+    isHighlight: true,
   },
   {
-    name: "Daisy Arnold",
-    value: "265.4 Eth",
-    img: "https://i.pravatar.cc/150?u=10",
+    name: "ของแถมจัดเต็ม เฉพาะวันนี้",
+    value: promoCreatedAt,
+    img: slides[0].image,
+  },
+  {
+    name: "Live แจกโค้ดลดเพิ่ม 21:00",
+    value: promoCreatedAt,
+    img: slides[1].image,
+  },
+  {
+    name: "แพ็กคู่สุดคุ้ม ราคาพิเศษ",
+    value: promoCreatedAt,
+    img: slides[2].image,
+  },
+  {
+    name: "ส่งด่วนภายใน 24 ชม. (กทม.)",
+    value: promoCreatedAt,
+    img: slides[0].image,
   },
 ];
 
-const baseFeedData = [
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, "") ||
+  "http://localhost:8080/api";
+
+const USE_MOCK_API =
+  process.env.NEXT_PUBLIC_USE_MOCK === "true" ||
+  !process.env.NEXT_PUBLIC_API_BASE_URL ||
+  API_BASE_URL.includes("localhost") ||
+  API_BASE_URL.includes("127.0.0.1");
+
+const MOCK_POSTS: FeedItem[] = [
   {
-    id: 1,
-    title: "บ้านโมเดิร์น 2024 เน้นพื้นที่สีเขียว",
-    user: "ArchDesign",
-    time: "1 วัน",
-    likes: "2.3k",
-    comments: "310",
+    id: "mock-1",
+    user: "KP Group",
+    time: "เมื่อสักครู่",
+    likes: "128",
+    comments: "14",
     image:
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800",
-    content: "เทรนด์การออกแบบปีนี้เน้นความยั่งยืนและการนำธรรมชาติเข้ามาในบ้าน",
-  },
-  {
-    id: 2,
-    title: "นวดสปาผ่อนคลายที่ ME AURA ดีมาก!",
-    user: "RelaxQueen",
-    time: "5 ชม.",
-    likes: "850",
-    comments: "45",
-    image:
-      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=800",
-    content: "แนะนำเลยค่ะ ใครทำงานหนักๆ มานวดที่นี่คือจบ สบายตัวสุดๆ",
-  },
-  {
-    id: 3,
-    title: "รีวิวแต่งบ้านสไตล์มินิมอล งบประหยัด",
-    user: "HomeDecor_TH",
-    time: "2 ชม.",
-    likes: "1.2k",
-    comments: "128",
-    image:
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop",
     content:
-      "วันนี้มาแชร์ไอเดียแต่งห้องรับแขกใหม่ครับ ใช้งบไม่เยอะแต่ดูแพงมาก!",
+      "รีวิวบ้านสไตล์โมเดิร์นที่เน้นแสงธรรมชาติ ✨\n\nจุดที่ชอบที่สุดคือโถงกลางสูงโปร่งและหน้าต่างบานใหญ่ ทำให้บ้านดูโล่งขึ้นทันที\n\nทริคเล็ก ๆ: ใช้โทนสีอ่อน + งานไม้ จะทำให้ภาพรวมดูอบอุ่นแบบพรีเมียมมากขึ้น",
+  },
+  {
+    id: "mock-2",
+    user: "KP House 101",
+    time: "1 ชม.",
+    likes: "96",
+    comments: "8",
+    image:
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=2070&auto=format&fit=crop",
+    content:
+      "ไอเดียจัดพื้นที่ห้องเล็กให้ดูกว้างขึ้น\n\n1) ตู้สูงชนเพดาน\n2) เฟอร์นิเจอร์ Multi-function\n3) เลือกไฟ warm + แสงซ่อน\n\nทำครบ 3 ข้อนี้ ห้องจะดูเป็นสตูดิโอหรูขึ้นทันทีครับ",
+  },
+  {
+    id: "mock-3",
+    user: "ME AURA",
+    time: "2 ชม.",
+    likes: "211",
+    comments: "22",
+    image:
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=2070&auto=format&fit=crop",
+    content:
+      "สปาแบบ ‘เงียบจริง’ คือดีต่อใจมาก\n\nห้องทรีตเมนต์ที่ใช้กลิ่นอโรม่าเบา ๆ + เพลงบรรเลง ทำให้โฟกัสกับการผ่อนคลายได้สุด ๆ\n\nใครเครียดจากงาน ลองให้รางวัลตัวเองสัก 90 นาที แล้วจะเข้าใจคำว่ารีเซ็ตพลังครับ",
+  },
+  {
+    id: "mock-4",
+    user: "มนัสการแพทย์",
+    time: "เมื่อวาน",
+    likes: "64",
+    comments: "5",
+    image:
+      "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2070&auto=format&fit=crop",
+    content:
+      "อัปเดตเบื้องต้น: เลือกอุปกรณ์ที่ ‘มาตรฐานชัด’ ก่อนสเปกแรง\n\n- เอกสารรับรองต้องครบ\n- การซ่อมบำรุงต้องมีทีมรองรับ\n- อะไหล่ต้องหาได้\n\nของดีคือของที่ใช้งานได้ยาว ๆ และดูแลต่อได้ง่ายครับ",
+  },
+  {
+    id: "mock-5",
+    user: "KP Group",
+    time: "2 วันที่แล้ว",
+    likes: "320",
+    comments: "41",
+    image:
+      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=2070&auto=format&fit=crop",
+    content:
+      "Mood & Tone ที่ทำให้โปรเจกต์ดูแพงขึ้น\n\n• สีหลัก 1 สี + สีรอง 1 สี\n• ใช้ฟอนต์ Bold กับหัวข้อ และ Medium กับเนื้อหา\n• เว้นพื้นที่ว่างให้หายใจ\n\nดีไซน์ที่ดูพรีเมียมมักไม่ได้ใส่เยอะ แต่ใส่ ‘ถูกจุด’ ครับ",
+  },
+  {
+    id: "mock-6",
+    user: "ME AURA",
+    time: "3 วันที่แล้ว",
+    likes: "152",
+    comments: "11",
+    image:
+      "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=2070&auto=format&fit=crop",
+    content:
+      "ไอเดียมุมพักผ่อนในบ้านแบบสปา\n\nจัดมุมเล็ก ๆ ใกล้หน้าต่าง + ต้นไม้ 1 กระถาง + โคมไฟ warm\n\nแค่นี้ก็ได้พื้นที่ชาร์จพลังทุกเย็นแล้วครับ",
+  },
+  {
+    id: "mock-7",
+    user: "KP House 101",
+    time: "1 สัปดาห์",
+    likes: "88",
+    comments: "9",
+    image:
+      "https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=2070&auto=format&fit=crop",
+    content:
+      "Checklist ก่อนรีโนเวท\n\n- วัดพื้นที่จริง (และเผื่อ tolerance)\n- วางตำแหน่งปลั๊ก/สวิตช์ให้พอ\n- เลือกวัสดุที่ทำความสะอาดง่าย\n\nทำการบ้านก่อน เริ่มงานจริงจะไหลลื่นกว่าเดิมมากครับ",
+  },
+  {
+    id: "mock-8",
+    user: "มนัสการแพทย์",
+    time: "2 สัปดาห์",
+    likes: "45",
+    comments: "3",
+    image:
+      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop",
+    content:
+      "ความปลอดภัยของผู้ใช้งานมาก่อนเสมอ\n\nถ้าต้องเลือกระหว่าง ‘ถูก’ กับ ‘มาตรฐาน’ — ให้เลือกมาตรฐาน\n\nเพราะสุดท้ายต้นทุนที่แพงที่สุดคือความเสี่ยงครับ",
   },
 ];
+
 
 // --- Sub-components ---
 const PromoCard = ({ item }: { item: PromoItem }) => {
@@ -244,15 +343,322 @@ const PromoCard = ({ item }: { item: PromoItem }) => {
   );
 };
 
+const ConfettiOverlay = ({ active }: { active: boolean }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const piecesRef = useRef<any[]>([]);
+  const mxRef = useRef(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
+
+    // If not active, stop & clear
+    if (!active) {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      piecesRef.current = [];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+
+    const COUNT = 900;
+    const SPEED = 2.75;
+
+    let w = 0;
+    let h = 0;
+    let dpr = Math.min(2, window.devicePixelRatio || 1);
+
+    const palette: [number, number, number][] = [
+      [255, 214, 102],
+      [255, 107, 107],
+      [116, 185, 255],
+      [120, 224, 143],
+      [235, 235, 235],
+    ];
+
+    const rand = (a: number, b: number) => a + Math.random() * (b - a);
+    const pick = <T,>(arr: T[]) => arr[(Math.random() * arr.length) | 0];
+
+    const spriteCache = new Map<string, { img: HTMLCanvasElement; ox: number; oy: number }>();
+
+    const spriteKey = (r: number, g: number, b: number, bw: number, bh: number, blur: number) =>
+      `${r},${g},${b}|${bw}x${bh}|${blur}`;
+
+    const makeSprite = (r: number, g: number, b: number, bw: number, bh: number, blur: number) => {
+      const pad = blur ? Math.ceil(blur * 3 + 6) : 2;
+      const c = document.createElement("canvas");
+      c.width = bw + pad * 2;
+      c.height = bh + pad * 2;
+      const cctx = c.getContext("2d");
+      if (!cctx) return { img: c, ox: pad + bw / 2, oy: pad + bh / 2 };
+
+      cctx.clearRect(0, 0, c.width, c.height);
+
+      if (blur) {
+        cctx.shadowColor = `rgb(${r},${g},${b})`;
+        cctx.shadowBlur = blur;
+      }
+
+      cctx.fillStyle = `rgb(${r},${g},${b})`;
+      cctx.fillRect(pad, pad, bw, bh);
+      cctx.shadowBlur = 0;
+
+      // Subtle paper grain
+      const dots = Math.max(18, Math.floor((bw * bh) / 9));
+      for (let i = 0; i < dots; i++) {
+        const x = (pad + Math.random() * bw) | 0;
+        const y = (pad + Math.random() * bh) | 0;
+        const v = (Math.random() * 60 - 30) | 0;
+        const rr = Math.max(0, Math.min(255, r + v));
+        const gg = Math.max(0, Math.min(255, g + v));
+        const bb = Math.max(0, Math.min(255, b + v));
+        cctx.globalAlpha = 0.14 + Math.random() * 0.26;
+        cctx.fillStyle = `rgb(${rr},${gg},${bb})`;
+        cctx.fillRect(x, y, 1, 1);
+      }
+      cctx.globalAlpha = 1;
+
+      return { img: c, ox: pad + bw / 2, oy: pad + bh / 2 };
+    };
+
+    const getSprite = (r: number, g: number, b: number, bw: number, bh: number, blur: number) => {
+      const key = spriteKey(r, g, b, bw, bh, blur);
+      const cached = spriteCache.get(key);
+      if (cached) return cached;
+      const spr = makeSprite(r, g, b, bw, bh, blur);
+      spriteCache.set(key, spr);
+      return spr;
+    };
+
+    const resize = () => {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      mxRef.current = (e.clientX / Math.max(1, w)) * 2 - 1;
+    };
+
+    const makePiece = (init: boolean) => {
+      const z = Math.random();
+      const layer = z < 0.5 ? 0 : z < 0.85 ? 1 : 2;
+
+      const hero = layer === 2 && Math.random() < 0.35;
+      const ultra = layer === 2 && Math.random() < 0.05;
+      const floaty = Math.random() < 0.22;
+
+      const insaneFlip = Math.random() < 0.06;
+      const fastFlip = !insaneFlip && Math.random() < 0.22;
+
+      const base =
+        layer === 0
+          ? rand(2, 4)
+          : layer === 1
+            ? rand(4, 7)
+            : ultra
+              ? rand(34, 55)
+              : hero
+                ? rand(18, 28)
+                : rand(12, 20);
+
+      const x = rand(-140, w + 140);
+      const y = init ? rand(-80, h + 80) : rand(-260, -60);
+
+      const vy =
+        layer === 0 ? rand(0.35, 0.85) : layer === 1 ? rand(0.7, 1.35) : rand(1.05, 2.0);
+
+      const vx =
+        layer === 0 ? rand(0.1, 0.28) : layer === 1 ? rand(0.16, 0.42) : rand(0.22, 0.62);
+
+      const rgb = pick(palette);
+      const r = Math.round(rgb[0] * 0.72);
+      const g = Math.round(rgb[1] * 0.72);
+      const b = Math.round(rgb[2] * 0.72);
+
+      const aspect = floaty ? rand(1.15, 1.75) : rand(1.0, 1.55);
+      const bw = Math.max(2, Math.round(base * rand(0.85, 1.25)));
+      const bh = Math.max(3, Math.round(bw * aspect));
+
+      let flipSpeed: number;
+      if (insaneFlip) flipSpeed = rand(0.14, 0.26);
+      else if (fastFlip) flipSpeed = rand(0.06, 0.12);
+      else flipSpeed = rand(0.02, 0.05);
+
+      const blur = ultra ? 3 : 0;
+      const spr = getSprite(r, g, b, bw, bh, blur);
+
+      return {
+        x,
+        y,
+        layer,
+        hero,
+        ultra,
+        floaty,
+        spr,
+        vx,
+        vy,
+        rot: rand(0, Math.PI * 2),
+        vr: rand(-0.02, 0.02) * (layer + 1),
+        sway: rand(0, Math.PI * 2),
+        swaySpeed: rand(0.01, 0.02),
+        drift: rand(0.2, 0.6),
+        flip: rand(0, Math.PI * 2),
+        flipSpeed,
+      };
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+    window.addEventListener("pointermove", onPointerMove);
+
+    // Seed pieces
+    piecesRef.current = Array.from({ length: COUNT }, () => makePiece(true));
+
+    let last = performance.now();
+
+    const draw = (now: number) => {
+      const dt = Math.min(0.033, (now - last) / 1000);
+      last = now;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const t = now * 0.001;
+      const wind = 0.5 + Math.sin(t * 0.35) * 0.18 + mxRef.current * 0.3;
+
+      const pieces = piecesRef.current;
+
+      for (let i = 0; i < pieces.length; i++) {
+        const p = pieces[i];
+        const depth = p.layer === 0 ? 0.55 : p.layer === 1 ? 0.85 : 1.0;
+
+        p.sway += p.swaySpeed * 60 * dt * SPEED;
+        p.flip += p.flipSpeed * 60 * dt * SPEED;
+
+        const floatDrift = Math.sin(p.sway) * p.drift * (p.floaty ? 1.15 : 1.0);
+        const fall = p.floaty ? 0.52 + 0.24 * Math.sin(p.sway * 0.9) : 0.85;
+
+        p.x += (wind * depth + floatDrift + p.vx) * 60 * dt * SPEED;
+        p.y += p.vy * fall * 60 * dt * SPEED;
+        p.rot += p.vr * 60 * dt * SPEED;
+
+        if (p.x < -300) p.x = w + 300;
+        if (p.x > w + 300) p.x = -300;
+        if (p.y > h + 340) pieces[i] = makePiece(false);
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.scale(0.06 + 0.94 * Math.abs(Math.sin(p.flip)), 1);
+        ctx.globalAlpha =
+          p.layer === 0 ? 0.16 : p.layer === 1 ? 0.42 : p.ultra ? 0.95 : p.hero ? 0.9 : 0.72;
+        ctx.drawImage(p.spr.img, -p.spr.ox, -p.spr.oy);
+        ctx.restore();
+      }
+
+      rafRef.current = requestAnimationFrame(draw);
+    };
+
+    rafRef.current = requestAnimationFrame(draw);
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("pointermove", onPointerMove);
+      piecesRef.current = [];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+  }, [active]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className={`fixed inset-0 pointer-events-none z-9999 transition-opacity duration-300 ${active ? "opacity-100" : "opacity-0"}`}
+    />
+  );
+};
+
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [visibleFeeds, setVisibleFeeds] = useState<FeedItem[]>([]);
+  const [baseFeeds, setBaseFeeds] = useState<FeedItem[]>([]);
+  const [loopCount, setLoopCount] = useState(1);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(false);
   const [isFacebookPinned, setIsFacebookPinned] = useState(false);
-  const [activeBgImage, setActiveBgImage] = useState(baseFeedData[0].image);
+  const [activeBgImage, setActiveBgImage] = useState<string>(slides[0].image);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showFireworks, setShowFireworks] = useState(false);
+  const [toastMsg, setToastMsg] = useState<string>("");
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const loaderRef = useRef<HTMLDivElement | null>(null);
   const facebookSectionRef = useRef<HTMLElement | null>(null);
+  const feedEndRef = useRef<HTMLDivElement | null>(null);
+  const energyBaseDistanceRef = useRef<number>(0);
+  const lastGoodFeedsRef = useRef<FeedItem[]>([]);
+  const lastFeedSignatureRef = useRef<string>("");
+  const isFetchingMoreRef = useRef(false);
+  const [energyOverride, setEnergyOverride] = useState<number | null>(null);
+  const energyOverrideRef = useRef<number | null>(null);
+  const didTriggerEnergyFullRef = useRef(false);
+
+  const fireworksTimersRef = useRef<{
+    hide?: ReturnType<typeof setTimeout>;
+    reset?: ReturnType<typeof setTimeout>;
+    release?: ReturnType<typeof setTimeout>;
+    toast?: ReturnType<typeof setTimeout>;
+  }>({});
+
+  const clearFireworksTimers = () => {
+    const t = fireworksTimersRef.current;
+    if (t.hide) clearTimeout(t.hide);
+    if (t.reset) clearTimeout(t.reset);
+    if (t.release) clearTimeout(t.release);
+    if (t.toast) clearTimeout(t.toast);
+    fireworksTimersRef.current = {};
+  };
+
+  const setEnergyOverrideSafe = (v: number | null) => {
+    energyOverrideRef.current = v;
+    setEnergyOverride(v);
+  };
+
+  const resetEnergyCycleFromCurrentScroll = () => {
+    const el = facebookSectionRef.current;
+    if (!el) {
+      energyBaseDistanceRef.current = 0;
+      setScrollProgress(0);
+      didTriggerEnergyFullRef.current = false;
+      setEnergyOverrideSafe(null);
+      return;
+    }
+
+    const rect = el.getBoundingClientRect();
+    const pinThreshold = 96;
+    const isPinnedNow = rect.top <= pinThreshold;
+
+    if (!isPinnedNow) {
+      energyBaseDistanceRef.current = 0;
+      setScrollProgress(0);
+      didTriggerEnergyFullRef.current = false;
+      setEnergyOverrideSafe(null);
+      return;
+    }
+
+    const currentDistance = Math.abs(rect.top - pinThreshold);
+    energyBaseDistanceRef.current = currentDistance;
+    setScrollProgress(0);
+    didTriggerEnergyFullRef.current = false;
+    setEnergyOverrideSafe(null);
+  };
 
   useEffect(() => {
     const onScroll = () => {
@@ -269,14 +675,16 @@ export default function Home() {
         const sectionHeight = el.scrollHeight;
         const visibleHeight = window.innerHeight;
 
-        const totalScrollableInSection = sectionHeight - visibleHeight;
+        const totalScrollableInSection = Math.max(1, sectionHeight - visibleHeight);
+        const adjustedDistance = Math.max(0, scrolledDistance - energyBaseDistanceRef.current);
         const progress = Math.min(
-          Math.max((scrolledDistance / totalScrollableInSection) * 100, 0),
+          Math.max((adjustedDistance / totalScrollableInSection) * 100, 0),
           100,
         );
-        setScrollProgress(progress);
+        if (energyOverrideRef.current === null) setScrollProgress(progress);
       } else {
-        setScrollProgress(0);
+        energyBaseDistanceRef.current = 0;
+        if (energyOverrideRef.current === null) setScrollProgress(0);
       }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -293,29 +701,151 @@ export default function Home() {
     };
   }, []);
 
+
+
+  // Fetch posts from API (keep old if empty, detect changes)
+  const fetchPosts = async () => {
+    if (isFetchingMoreRef.current) return;
+    isFetchingMoreRef.current = true;
+    setIsLoadingPosts(true);
+
+    try {
+      if (USE_MOCK_API) {
+        // Early return with mock data
+        const signature = MOCK_POSTS.map((p) => p.id).join("|");
+        lastFeedSignatureRef.current = signature;
+        lastGoodFeedsRef.current = MOCK_POSTS;
+        setBaseFeeds(MOCK_POSTS);
+        setLoopCount(1);
+        if (MOCK_POSTS[0]?.image) setActiveBgImage(MOCK_POSTS[0].image);
+        return;
+      }
+
+      const res = await fetch(`${API_BASE_URL}/posts`, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json();
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.posts)
+          ? data.posts
+          : [];
+
+      const normalized: FeedItem[] = list
+        .filter(Boolean)
+        .map((p: any) => ({
+          id: typeof p?.id === "string" ? p.id : p?.id?.toString?.() || "",
+          title: typeof p?.title === "string" ? p.title : undefined,
+          user: String(p?.user ?? ""),
+          time: typeof p?.time === "string" ? p.time : undefined,
+          likes: p?.likes != null ? String(p.likes) : undefined,
+          comments: p?.comments != null ? String(p.comments) : undefined,
+          image: p?.image != null ? String(p.image) : undefined,
+          content: String(p?.content ?? ""),
+        }))
+        .filter((p) => p.id && (p.content || p.image));
+
+      // If API returns empty, keep baseFeeds unchanged
+      if (normalized.length === 0) {
+        // keep baseFeeds unchanged
+        return;
+      }
+
+      // Detect if content changed (by IDs)
+      const signature = normalized.map((p) => p.id).join("|");
+      const isNew = signature !== lastFeedSignatureRef.current;
+
+      if (isNew) {
+        lastFeedSignatureRef.current = signature;
+        lastGoodFeedsRef.current = normalized;
+        setBaseFeeds(normalized);
+        setLoopCount(1);
+        if (normalized[0]?.image) setActiveBgImage(normalized[0].image);
+      }
+      // If not new, do nothing — caller will extend the loop
+    } catch (err: unknown) {
+      console.error("❌ โหลดโพสต์จาก API ไม่สำเร็จ", err);
+      // keep baseFeeds unchanged
+    } finally {
+      setIsLoadingPosts(false);
+      isFetchingMoreRef.current = false;
+    }
+  };
+
   useEffect(() => {
-    const loadMore = () => {
-      setVisibleFeeds((prev) => {
-        const nextBatch = baseFeedData.map((item) => ({
-          ...item,
-          uniqueId: Math.random(),
-        }));
-        return [...prev, ...nextBatch];
-      });
-    };
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) loadMore();
-      },
-      { threshold: 0.1 },
-    );
-    if (loaderRef.current) observer.observe(loaderRef.current);
-    loadMore();
-    return () => observer.disconnect();
+    // Initial load
+    if (USE_MOCK_API) {
+      const signature = MOCK_POSTS.map((p) => p.id).join("|");
+      lastFeedSignatureRef.current = signature;
+      lastGoodFeedsRef.current = MOCK_POSTS;
+      setBaseFeeds(MOCK_POSTS);
+      setLoopCount(1);
+      if (MOCK_POSTS[0]?.image) setActiveBgImage(MOCK_POSTS[0].image);
+      // Do not call fetchPosts() in mock mode
+      return;
+    }
+    (async () => {
+      await fetchPosts();
+      // If first fetch had no data, keep empty (will retry on scroll)
+    })();
   }, []);
 
-  const handleFeedInView = (img: string) => {
-    setActiveBgImage(img);
+  // When user scrolls to the end of the current feed, try fetching new posts.
+  // If there are no new posts, extend the loop so the same content repeats.
+  useEffect(() => {
+    const el = feedEndRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      async (entries) => {
+        const entry = entries[0];
+        if (!entry?.isIntersecting) return;
+
+        // If we have no content yet, try loading.
+        if (baseFeeds.length === 0) {
+          await fetchPosts();
+          // If still empty, keep waiting (will re-trigger)
+          return;
+        }
+
+        // MOCK mode: loop the same 8 items forever with a short loading delay
+        if (USE_MOCK_API) {
+          setIsLoadingPosts(true);
+          setTimeout(() => {
+            setIsLoadingPosts(false);
+            resetEnergyCycleFromCurrentScroll();
+            setLoopCount((c) => c + 1);
+          }, 650);
+          return;
+        }
+
+        const before = lastFeedSignatureRef.current;
+        await fetchPosts();
+        const after = lastFeedSignatureRef.current;
+
+        // If nothing new came in, loop the same content again (simulate loading)
+        if (before === after) {
+          setIsLoadingPosts(true);
+          setTimeout(() => {
+            setIsLoadingPosts(false);
+            resetEnergyCycleFromCurrentScroll();
+            setLoopCount((c) => c + 1);
+          }, 650);
+        }
+      },
+      {
+        root: null,
+        rootMargin: "600px 0px", // prefetch/extend before hitting the very bottom
+        threshold: 0.01,
+      },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [baseFeeds.length]);
+
+  const handleFeedInView = (img?: string) => {
+    if (img) setActiveBgImage(img);
   };
 
   const nextSlide = () => {
@@ -326,9 +856,83 @@ export default function Home() {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
+  const renderPostContent = (text: string) => {
+    const clean = (text ?? "").replace(/\r\n/g, "\n");
+    const paragraphs = clean
+      .split(/\n{2,}/g)
+      .map((p) => p.trim())
+      .filter(Boolean);
+
+    return paragraphs.map((para, idx) => {
+      const lines = para.split(/\n/g);
+      return (
+        <p key={idx} className="mb-4 last:mb-0 whitespace-pre-wrap">
+          {lines.map((line, i) => (
+            <React.Fragment key={i}>
+              {line}
+              {i < lines.length - 1 ? <br /> : null}
+            </React.Fragment>
+          ))}
+        </p>
+      );
+    });
+  };
+
+  const repeatedFeeds = baseFeeds.length
+    ? Array.from({ length: loopCount }, (_, copyIdx) =>
+        baseFeeds.map((post) => ({ post, key: `${post.id}__${copyIdx}` })),
+      ).flat()
+    : [];
+
+  const energyProgress = energyOverride !== null ? energyOverride : scrollProgress;
+
+  useEffect(() => {
+    // Trigger once when energy reaches 100% then reset back to 0%
+    if (energyProgress >= 100 && !didTriggerEnergyFullRef.current) {
+      didTriggerEnergyFullRef.current = true;
+
+      // Clear any previous timers so we don't get stuck in an active state
+      clearFireworksTimers();
+
+      // Optional UI feedback
+      setToastMsg("พลังงานเต็ม 100% — รีเซ็ตใหม่!");
+      setShowFireworks(true);
+
+      // Force the bar to 100% momentarily, then reset to 0%
+      setEnergyOverrideSafe(100);
+
+      // Capture current scroll distance as baseline so next cycle starts from 0 smoothly
+      const el = facebookSectionRef.current;
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        const pinThreshold = 96;
+        const currentDistance = Math.abs(rect.top - pinThreshold);
+        energyBaseDistanceRef.current = currentDistance;
+      }
+
+      // IMPORTANT: Do NOT return a cleanup tied to energyProgress changes.
+      // EnergyProgress will change several times during the reset sequence.
+      fireworksTimersRef.current.hide = setTimeout(() => setShowFireworks(false), 2200);
+      fireworksTimersRef.current.reset = setTimeout(() => setEnergyOverrideSafe(0), 2300);
+      fireworksTimersRef.current.release = setTimeout(() => setEnergyOverrideSafe(null), 3000);
+      fireworksTimersRef.current.toast = setTimeout(() => setToastMsg(""), 3200);
+    }
+
+    // Allow triggering again after we've reset and energy is low
+    if (energyProgress <= 5 && didTriggerEnergyFullRef.current) {
+      didTriggerEnergyFullRef.current = false;
+    }
+  }, [energyProgress]);
+
+  useEffect(() => {
+    return () => {
+      clearFireworksTimers();
+    };
+  }, []);
+
   return (
     <div
-      className={`min-h-screen bg-[#F0F2F5] transition-colors duration-1000 text-white font-sans overflow-x-hidden selection:bg-black selection:text-white`}
+      className={`min-h-screen bg-white transition-colors duration-1000 text-black font-sans overflow-x-hidden selection:bg-black selection:text-white`}
     >
       {/* --- Header --- */}
       <header className="absolute top-0 left-0 w-full z-100 flex items-center justify-between px-6 py-6 md:px-12">
@@ -339,12 +943,10 @@ export default function Home() {
             <span className="font-light">BRAND</span>
           </span>
         </div>
-        
+
         <div className="flex items-center gap-4">
           <button className="bg-white/10 backdrop-blur-md p-2.5 rounded-full border border-white/20">
-            <Phone
-              size={20}
-            />
+            <Phone size={20} />
           </button>
         </div>
       </header>
@@ -571,7 +1173,7 @@ export default function Home() {
 
             {/* Right Content (Progress and Images) */}
             <div className="lg:col-span-5 flex flex-col gap-10">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <Image
                   src="https://pai.nomadenstudio.com/aurelia/wp-content/uploads/sites/6/2024/11/smiling-young-african-woman-working-online-with-a-3M7W2SX-1024x683.jpg"
                   width={1200}
@@ -669,26 +1271,38 @@ export default function Home() {
         ref={facebookSectionRef}
         className="relative w-full min-h-screen"
       >
-        {/* Dynamic Blurred Background Layer */}
-        <div className="absolute inset-0 transition-all duration-1000 ease-in-out transform scale-110 pointer-events-none">
-          <Image
-            src={activeBgImage}
-            alt="section-bg"
-            fill
-            sizes="100vw"
-            className="object-cover blur-[100px] opacity-40"
-          />
-          <div
-            className={`absolute inset-0 backdrop-blur-3xl ${isDarkMode ? "bg-black/60" : "bg-white/30"}`}
-          />
-        </div>
+        {/* Fireworks burst when energy reaches 100% (every 2 loops) */}
+        <ConfettiOverlay active={showFireworks} />
+
+        {/* Score toast bottom-right */}
+        {toastMsg ? (
+          <div className="fixed bottom-6 right-6 z-9999">
+            <div
+              className={`px-5 py-4 rounded-2xl shadow-2xl border backdrop-blur-xl max-w-xs ${
+                isDarkMode
+                  ? "bg-black/50 border-white/15 text-white"
+                  : "bg-white/70 border-black/10 text-black"
+              }`}
+            >
+              <p className="font-black text-[10px] uppercase tracking-[0.25em] opacity-70 mb-1">
+                Reward
+              </p>
+              <p className="font-bold text-sm leading-snug">{toastMsg}</p>
+              <p className="mt-2 text-[11px] font-black opacity-70">
+                คะแนนรวม: {score}
+              </p>
+            </div>
+          </div>
+        ) : null}
+        {/* Plain background for feed */}
+        <div className="absolute inset-0 bg-white" />
 
         <div
-          className={`relative z-10 max-w-7xl mx-auto px-4 pt-16 flex gap-8 pb-32 transition-all duration-500 ${isFacebookPinned ? "lg:px-32" : ""}`}
+          className={`relative z-10 max-w-7xl mx-auto px-4 pt-16 flex gap-8 pb-32 transition-all duration-500`}
         >
           {/* Left Sidebar - Bottom Footer with Search & Mode Switch only */}
           <aside
-            className={`hidden lg:flex flex-col w-64 shrink-0 ${isFacebookPinned ? "fixed top-24 left-10 h-[calc(100vh-120px)] z-50" : "sticky top-24 h-[calc(100vh-120px)] z-10"}`}
+            className={`${isFacebookPinned ? "lg:flex flex-col w-64 shrink-0 fixed top-24 left-10 h-[calc(100vh-120px)] z-50" : "hidden"}`}
           >
             {/* Bottom Footer with Search & Mode Switch pushed to bottom */}
             <div className="mt-auto flex flex-col gap-4">
@@ -698,29 +1312,29 @@ export default function Home() {
                 >
                   <Search size={22} />
                 </button>
-                <button
+                {/* <button
                   onClick={() => setIsDarkMode(!isDarkMode)}
                   className={`flex-1 h-14 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl border border-white/30 backdrop-blur-xl active:scale-95 font-black text-[10px] uppercase tracking-[0.2em] ${isDarkMode ? "bg-white/10 text-white" : "bg-black/10 text-black"}`}
                 >
                   {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
                   {isDarkMode ? "Light" : "Dark"}
-                </button>
+                </button> */}
               </div>
               <div
                 className={`px-2 font-black text-[9px] uppercase tracking-[0.3em] italic opacity-50 ${isDarkMode ? "text-white" : "text-black"}`}
               >
-                © 2026 KP Group
+                © REVIEW NEWS BRAND
               </div>
             </div>
           </aside>
 
           {/* Main Feed */}
           <main className="flex-1 max-w-2xl mx-auto flex flex-col gap-10">
-            {visibleFeeds.map((post) => (
+            {repeatedFeeds.map(({ post, key }) => (
               <div
-                key={post.uniqueId}
+                key={key}
                 onMouseEnter={() => handleFeedInView(post.image)}
-                className={`group relative backdrop-blur-2xl rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border overflow-hidden transition-all duration-500 hover:scale-[1.02] ${isDarkMode ? "bg-white/5 border-white/10 hover:bg-white/10" : "bg-white/20 border-white/40 hover:bg-white/30"}`}
+                className={`group relative backdrop-blur-2xl rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border overflow-hidden transition-all duration-500 ${isDarkMode ? "bg-white/5 border-white/10" : "bg-white/20 border-white/40"}`}
               >
                 <div className="p-6 flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -747,28 +1361,30 @@ export default function Home() {
                       </p>
                     </div>
                   </div>
-                  <button className="text-gray-500 p-3 hover:bg-white/50 rounded-2xl transition-colors">
+                  <button className="text-gray-500 p-3 rounded-2xl transition-colors">
                     <MoreHorizontal size={20} />
                   </button>
                 </div>
 
                 <div className="px-6 pb-4">
-                  <p
-                    className={`text-[15px] font-medium leading-relaxed italic ${isDarkMode ? "text-white/80" : "text-black/80"}`}
+                  <div
+                    className={`text-[15px] font-medium leading-7 ${isDarkMode ? "text-white/80" : "text-black/80"}`}
                   >
-                    {post.content}
-                  </p>
+                    {renderPostContent(post.content)}
+                  </div>
                 </div>
 
-                <div className="mx-6 mb-6 rounded-4xl overflow-hidden shadow-2xl relative aspect-4/3 group-hover:shadow-white/20 transition-all">
-                  <Image
-                    src={post.image}
-                    alt="post"
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 768px"
-                    className="object-cover transform group-hover:scale-110 transition-transform duration-700"
-                  />
-                </div>
+                {post.image ? (
+                  <div className="mx-6 mb-6 rounded-2xl overflow-hidden shadow-2xl relative aspect-4/3 transition-all">
+                    <Image
+                      src={post.image}
+                      alt="post"
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 768px"
+                      className="object-cover transform transition-transform duration-700"
+                    />
+                  </div>
+                ) : null}
 
                 <div
                   className={`px-8 py-4 flex justify-between items-center border-t text-xs font-black uppercase tracking-widest bg-white/5 ${isDarkMode ? "text-white/60 border-white/10" : "text-gray-700/80 border-white/20"}`}
@@ -777,9 +1393,11 @@ export default function Home() {
                     <div className="bg-linear-to-tr from-red-500 to-pink-500 p-1.5 rounded-full shadow-lg shadow-red-500/20">
                       <Heart size={10} className="fill-white text-white" />
                     </div>
-                    <span>{post.likes} Likes</span>
+                    <span>{post.likes ?? "0"} Likes</span>
                   </div>
-                  <span className="opacity-60">{post.comments} Comments</span>
+                  <span className="opacity-60">
+                    {post.comments ?? "0"} Comments
+                  </span>
                 </div>
 
                 <div className="px-3 py-2 flex gap-2">
@@ -790,7 +1408,7 @@ export default function Home() {
                   ].map((action, i) => (
                     <button
                       key={i}
-                      className={`flex-1 py-4 font-black text-[10px] uppercase tracking-[0.2em] rounded-3xl flex items-center justify-center gap-3 transition-all active:scale-95 ${isDarkMode ? "text-white hover:bg-white/10" : "text-gray-800 hover:bg-white/40"}`}
+                      className={`flex-1 py-4 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 ${isDarkMode ? "text-white" : "text-gray-800"}`}
                     >
                       <action.icon size={18} /> {action.label}{" "}
                       {i === 2 ? (scrollProgress > 95 ? "🚀" : "") : ""}
@@ -799,16 +1417,19 @@ export default function Home() {
                 </div>
               </div>
             ))}
-            <div ref={loaderRef} className="py-20 flex justify-center">
-              <div
-                className={`w-10 h-10 border-4 border-t-black rounded-full animate-spin ${isDarkMode ? "border-white/10 border-t-white" : "border-black/10 border-t-black"}`}
-              ></div>
-            </div>
+            {isLoadingPosts ? (
+              <div className="py-20 flex justify-center">
+                <div
+                  className={`w-10 h-10 border-4 border-t-black rounded-full animate-spin ${isDarkMode ? "border-white/10 border-t-white" : "border-black/10 border-t-black"}`}
+                ></div>
+              </div>
+            ) : null}
+            <div ref={feedEndRef} className="h-1" />
           </main>
 
           {/* Right Sidebar - Vertical Energy Charging Bar */}
           <aside
-            className={`hidden lg:block w-72 shrink-0 ${isFacebookPinned ? "fixed top-24 right-10 z-50" : "sticky top-24 h-[calc(100vh-160px)] z-10"}`}
+            className={`${isFacebookPinned ? "lg:block w-64 shrink-0 fixed top-24 right-10 h-[calc(100vh-120px)] z-50" : "hidden"}`}
           >
             <div
               className={`h-125 w-24 backdrop-blur-2xl rounded-full border shadow-2xl relative overflow-hidden flex flex-col justify-end p-2 mx-auto ${isDarkMode ? "bg-white/5 border-white/20" : "bg-white/10 border-white/30"}`}
@@ -820,11 +1441,11 @@ export default function Home() {
               <div
                 className="w-full rounded-full transition-all duration-300 ease-out relative"
                 style={{
-                  height: `${scrollProgress}%`,
+                  height: `${energyProgress}%`,
                   background: `linear-gradient(to top, #3b82f6, #8b5cf6, #ec4899)`,
                   boxShadow:
-                    scrollProgress > 5
-                      ? `0 0 40px ${scrollProgress > 70 ? "#ec4899" : "#8b5cf6"}`
+                    energyProgress > 5
+                      ? `0 0 40px ${energyProgress > 70 ? "#ec4899" : "#8b5cf6"}`
                       : "none",
                 }}
               >
@@ -832,10 +1453,10 @@ export default function Home() {
                 <div className="absolute inset-0 bg-linear-to-t from-transparent via-white/40 to-transparent animate-shimmer" />
 
                 {/* Energy Particles */}
-                {scrollProgress > 5 && (
+                {energyProgress > 5 && (
                   <div className="absolute top-4 left-1/2 -translate-x-1/2 opacity-90 scale-125 z-20">
                     <Zap
-                      className={`text-white fill-white ${scrollProgress > 90 ? "animate-ping" : "animate-pulse"}`}
+                      className={`text-white fill-white ${energyProgress > 90 ? "animate-ping" : "animate-pulse"}`}
                       size={32}
                     />
                   </div>
@@ -845,12 +1466,12 @@ export default function Home() {
               {/* Energy Percentage Display */}
               <div className="absolute bottom-12 left-0 w-full text-center z-30">
                 <span
-                  className={`font-black text-2xl drop-shadow-md italic transition-colors duration-500 ${scrollProgress > 50 || isDarkMode ? "text-white" : "text-black/60"}`}
+                  className={`font-black text-2xl drop-shadow-md italic transition-colors duration-500 ${energyProgress > 50 || isDarkMode ? "text-white" : "text-black/60"}`}
                 >
-                  {Math.round(scrollProgress)}%
+                  {Math.round(energyProgress)}%
                 </span>
                 <p
-                  className={`text-[9px] font-bold uppercase tracking-[0.2em] mt-1 ${scrollProgress > 50 || isDarkMode ? "text-white/70" : "text-black/40"}`}
+                  className={`text-[9px] font-bold uppercase tracking-[0.2em] mt-1 ${energyProgress > 50 || isDarkMode ? "text-white/70" : "text-black/40"}`}
                 >
                   Charged
                 </p>
