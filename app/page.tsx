@@ -1,15 +1,10 @@
 "use client";
 
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { Kanit } from "next/font/google";
 import {
+  Bell,
   Bookmark,
   Heart,
   MessageCircle,
@@ -21,9 +16,6 @@ const kanit = Kanit({
   subsets: ["thai", "latin"],
   weight: ["300", "400", "600"],
 });
-
-const HERO_GIF =
-  "https://cdn.dribbble.com/userupload/28278224/file/original-f03004725755819f9e58feea7e324e31.gif";
 
 type Post = {
   id: string;
@@ -59,23 +51,9 @@ const SEEDS = [
 function randomPick<T>(arr: T[]) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
+
 function makeId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
-function useLockOnScroll(scrollThreshold = 150) {
-  const [isLocked, setIsLocked] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => {
-      setIsLocked(window.scrollY >= scrollThreshold);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [scrollThreshold]);
-
-  return { isLocked };
 }
 
 function useInfinitePosts() {
@@ -89,8 +67,12 @@ function useInfinitePosts() {
     const isPet = name === "Lu-Hu";
     const likes = Math.floor(Math.random() * 5000) + 100;
 
-    const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`;
-    const imageUrl = `https://api.dicebear.com/7.x/${isPet ? "bottts" : "adventurer"}/svg?seed=${encodeURIComponent(seed)}`;
+    const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+      name,
+    )}`;
+    const imageUrl = `https://api.dicebear.com/7.x/${
+      isPet ? "bottts" : "adventurer"
+    }/svg?seed=${encodeURIComponent(seed)}`;
 
     return {
       id: makeId(),
@@ -128,7 +110,6 @@ function useInfinitePosts() {
   );
 
   useEffect(() => {
-    // initial
     loadMore(4);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -137,243 +118,182 @@ function useInfinitePosts() {
 }
 
 export default function Home() {
-  const { isLocked } = useLockOnScroll(150);
   const { posts, loadMore, justAddedIds } = useInfinitePosts();
-
   const feedRef = useRef<HTMLDivElement | null>(null);
+  const isLoadingRef = useRef(false);
 
-  // ถ้ากลับมาไม่ locked ให้รีเซ็ต scroll ใน feed
-  useEffect(() => {
-    if (!isLocked && feedRef.current) {
-      feedRef.current.scrollTop = 0;
-    }
-  }, [isLocked]);
-
-  // โหลดเพิ่มเมื่อ scroll ใกล้ล่างสุดของ feed
+  // Infinite scroll ภายใน feed container
   useEffect(() => {
     const el = feedRef.current;
     if (!el) return;
 
-    const onFeedScroll = () => {
-      const nearBottom =
-        el.scrollTop + el.clientHeight >= el.scrollHeight - 300;
-      if (nearBottom) loadMore(1);
+    const onScroll = () => {
+      const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 300;
+      if (!nearBottom) return;
+      if (isLoadingRef.current) return;
+
+      isLoadingRef.current = true;
+      loadMore(1);
+
+      // กันการ trigger ถี่เกินไปเล็กน้อย
+      window.setTimeout(() => {
+        isLoadingRef.current = false;
+      }, 250);
     };
 
-    el.addEventListener("scroll", onFeedScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onFeedScroll);
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
   }, [loadMore]);
 
-  // เลื่อนเม้าส์ขึ้นบนสุดของ feed -> กลับไปบนสุดของหน้า
-  useEffect(() => {
-    const el = feedRef.current;
-    if (!el) return;
-
-    const onWheel = (e: WheelEvent) => {
-      if (el.scrollTop <= 0 && e.deltaY < 0) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-    };
-
-    el.addEventListener("wheel", onWheel, { passive: true });
-    return () => el.removeEventListener("wheel", onWheel);
+  const gridPaperBg = useMemo(() => {
+    // ลายตารางแบบ Grid Paper
+    return {
+      backgroundImage:
+        "linear-gradient(rgba(200,200,200,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(200,200,200,0.3) 1px, transparent 1px)",
+      backgroundSize: "20px 20px",
+    } as React.CSSProperties;
   }, []);
 
-  const mainWrapperClass = useMemo(() => {
-    return [
-      "fixed inset-0 flex flex-col transition-all duration-700",
-      isLocked ? "is-locked" : "",
-    ].join(" ");
-  }, [isLocked]);
-
   return (
-    <div className={`${kanit.className} relative bg-[#1a1c2c] text-white`}>
-      {/* พื้นหลังเบลอ (แทน body::before) */}
-      <div className="pointer-events-none fixed inset-0 -z-10">
-        <Image
-          src={HERO_GIF}
-          alt="background"
-          fill
-          unoptimized
-          priority
-          className="object-cover object-center scale-110 blur-3xl brightness-50"
-        />
-      </div>
-
-      {/* ตัวช่วยสร้างพื้นที่ให้ scroll (แทน .page-height-extender) */}
-      <div className="h-[calc(100vh+300px)]" />
-
-      {/* Main fixed container */}
-      <div className={mainWrapperClass}>
-        {/* HERO */}
-        <header
-          className={[
-            "relative w-full overflow-hidden shrink-0 transition-[height] duration-700 ease-[cubic-bezier(0.2,1,0.3,1)]",
-            isLocked ? "h-22.5" : "h-screen",
-          ].join(" ")}
-        >
-          {/* slideshow-container (ตอนนี้มีภาพเดียว) */}
-          <div className="absolute inset-0">
-            <Image
-              src={HERO_GIF}
-              alt="hero"
-              fill
-              unoptimized
-              priority
-              className="object-cover object-center"
-            />
-          </div>
-
-          {/* overlay */}
-          <div
-            className={[
-              "absolute inset-0 z-10 flex flex-col justify-end",
-              "bg-linear-to-t from-black/20 via-black/0 to-black/10",
-              isLocked ? "px-5 pb-1" : "px-5 pb-10",
-            ].join(" ")}
+    <div className={`${kanit.className} h-screen w-full overflow-hidden bg-white`}>
+      <div
+        ref={feedRef}
+        className="h-screen w-full overflow-y-auto bg-white [scrollbar-width:thin]"
+        style={gridPaperBg}
+      >
+        {/* Header ของ Feed (sticky) */}
+        <div className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-100 bg-white/70 px-4 py-4 backdrop-blur-md">
+          <h1 className="text-xl font-bold tracking-tighter text-gray-800">
+            MY FAMILY
+          </h1>
+          <button
+            type="button"
+            className="text-gray-600 hover:text-gray-800"
+            aria-label="notifications"
           >
-            {/* (ยังเว้นไว้เหมือนของเดิม) */}
-          </div>
-        </header>
+            <Bell className="h-6 w-6" />
+          </button>
+        </div>
 
-        {/* CONTENT CANVAS */}
-        <main
-          className={[
-            "z-20 mx-5 mb-5 flex-1 overflow-hidden bg-white text-black shadow-2xl",
-            "transition-all duration-700 ease-[cubic-bezier(0.2,1,0.3,1)]",
-            isLocked ? "mt-3.75 rounded-3xl" : "mt-0 rounded-[30px]",
-          ].join(" ")}
-        >
-          {/* FEED */}
-          <div
-            ref={feedRef}
-            className={[
-              "h-full w-full",
-              isLocked ? "overflow-y-auto" : "overflow-y-hidden",
-              "[&::-webkit-scrollbar]:w-0",
-            ].join(" ")}
-          >
-            <div>
-              {posts.map((p) => {
-                const isNew = justAddedIds.has(p.id);
+        {/* Posts */}
+        <div>
+          {posts.map((p) => {
+            const isNew = justAddedIds.has(p.id);
 
-                return (
-                  <article
-                    key={p.id}
-                    className={[
-                      "w-full border-b border-neutral-200 bg-white pb-5",
-                      "transition-all duration-1000",
-                      isNew
-                        ? "opacity-0 translate-y-8"
-                        : "opacity-100 translate-y-0",
-                    ].join(" ")}
+            return (
+              <article
+                key={p.id}
+                className={[
+                  "w-full border-b border-black/5 bg-transparent pb-5",
+                  "transition-all duration-1000",
+                  isNew ? "opacity-0 translate-y-8" : "opacity-100 translate-y-0",
+                ].join(" ")}
+              >
+                {/* header */}
+                <div className="flex items-center px-4 py-3">
+                  <div className="mr-3 h-8 w-8 overflow-hidden rounded-full border border-gray-200 bg-white">
+                    <Image
+                      src={p.avatarUrl}
+                      alt="avatar"
+                      width={32}
+                      height={32}
+                      unoptimized
+                      className="h-8 w-8"
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-gray-800">
+                      {p.username}
+                    </span>
+                    <span className="text-[10px] uppercase tracking-widest text-gray-400">
+                      Featured Creator
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="ml-auto text-gray-400 hover:text-gray-600"
+                    aria-label="more"
                   >
-                    {/* header */}
-                    <div className="flex items-center px-4 py-3">
-                      <div className="mr-3 h-8 w-8 overflow-hidden rounded-full border border-neutral-300 bg-neutral-100">
-                        <Image
-                          src={p.avatarUrl}
-                          alt="avatar"
-                          width={32}
-                          height={32}
-                          unoptimized
-                          className="h-8 w-8"
-                        />
-                      </div>
+                    <MoreHorizontal className="h-5 w-5" />
+                  </button>
+                </div>
 
-                      <div className="flex flex-col">
-                        <span className="text-sm font-semibold">
-                          {p.username}
-                        </span>
-                        <span className="text-[10px] uppercase tracking-widest text-neutral-400">
-                          Featured Creator
-                        </span>
-                      </div>
+                {/* image */}
+                <div className="relative aspect-video w-full overflow-hidden border-y border-black/5 bg-white">
+                  <Image
+                    src={p.imageUrl}
+                    alt={p.name}
+                    fill
+                    unoptimized
+                    className="object-cover"
+                  />
+                </div>
 
-                      <button
-                        type="button"
-                        className="ml-auto text-neutral-400 hover:text-neutral-600"
-                        aria-label="more"
-                      >
-                        <MoreHorizontal className="h-5 w-5" />
-                      </button>
+                {/* actions: Bookmark ซ้าย, กลุ่มหลักขวา */}
+                <div className="flex items-center gap-5 px-4 py-3 text-gray-900">
+                  <button
+                    type="button"
+                    className="transition-transform hover:scale-110"
+                    aria-label="bookmark"
+                  >
+                    <Bookmark className="h-7 w-7" />
+                  </button>
+
+                  <div className="ml-auto flex items-center gap-5">
+                    <button
+                      type="button"
+                      className="transition-transform hover:scale-110"
+                      aria-label="send"
+                    >
+                      <Send className="h-7 w-7" />
+                    </button>
+                    <button
+                      type="button"
+                      className="transition-transform hover:scale-110"
+                      aria-label="comment"
+                    >
+                      <MessageCircle className="h-7 w-7" />
+                    </button>
+                    <button
+                      type="button"
+                      className="transition-transform hover:scale-110"
+                      aria-label="like"
+                    >
+                      <Heart className="h-7 w-7" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* info */}
+                <div className="px-4 pb-6">
+                  {/* สลับฝั่ง: likes ไปขวา, caption ไปซ้าย */}
+                  <div className="mb-1 flex flex-row-reverse items-baseline justify-between gap-3">
+                    <div className="whitespace-nowrap text-right text-[0.9rem] font-semibold text-gray-800">
+                      {p.likes.toLocaleString()} likes
                     </div>
-
-                    {/* image */}
-                    <div className="relative aspect-video w-full overflow-hidden bg-neutral-50">
-                      <Image
-                        src={p.imageUrl}
-                        alt={p.name}
-                        fill
-                        unoptimized
-                        className="object-cover"
-                      />
+                    <div className="text-left text-[0.95rem] leading-6 text-gray-800">
+                      <b className="mr-2 font-bold">{p.username}</b>
+                      IP Design บนลายตาราง #MQFamily
                     </div>
+                  </div>
 
-                    {/* actions */}
-                    <div className="flex items-center gap-5 px-4 py-3 text-neutral-900">
-                      <button
-                        type="button"
-                        className="transition-transform hover:scale-110"
-                        aria-label="like"
-                      >
-                        <Heart className="h-7 w-7" />
-                      </button>
-                      <button
-                        type="button"
-                        className="transition-transform hover:scale-110"
-                        aria-label="comment"
-                      >
-                        <MessageCircle className="h-7 w-7" />
-                      </button>
-                      <button
-                        type="button"
-                        className="transition-transform hover:scale-110"
-                        aria-label="send"
-                      >
-                        <Send className="h-7 w-7" />
-                      </button>
+                  <div className="mt-1 cursor-pointer text-sm text-gray-400">
+                    View all 42 comments
+                  </div>
+                  <div className="mt-2 text-[10px] uppercase tracking-tight text-gray-300">
+                    Uploaded Just Now
+                  </div>
+                </div>
+              </article>
+            );
+          })}
 
-                      <button
-                        type="button"
-                        className="ml-auto transition-transform hover:scale-110"
-                        aria-label="bookmark"
-                      >
-                        <Bookmark className="h-7 w-7" />
-                      </button>
-                    </div>
-
-                    {/* info */}
-                    <div className="px-4 pb-6">
-                      <div className="mb-1.5 text-[0.9rem] font-semibold">
-                        {p.likes.toLocaleString()} likes
-                      </div>
-
-                      <div className="text-[0.95rem] leading-6">
-                        <b className="mr-2 font-bold">{p.username}</b>
-                        พบกับดีไซน์ใหม่ล่าสุดจากโปรเจกต์ MQ FAMILY
-                        ที่เราตั้งใจรังสรรค์ออกมาให้กว้างขวางและเข้าถึงทุกคนมากขึ้น!
-                        #MQFamily #DesignUpdate #WideScreen
-                      </div>
-
-                      <div className="mt-3 cursor-pointer text-sm text-neutral-400">
-                        View all 42 comments
-                      </div>
-
-                      <div className="mt-2 text-[10px] uppercase tracking-tight text-neutral-300">
-                        Uploaded Just Now
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
-
-              <div className="px-4 py-14 text-center text-sm text-neutral-400">
-                กำลังโหลดสมาชิกครอบครัวเพิ่มเติม...
-              </div>
-            </div>
+          <div className="px-4 py-14 text-center text-sm text-gray-400">
+            กำลังโหลดสมาชิกครอบครัวเพิ่มเติม...
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );
